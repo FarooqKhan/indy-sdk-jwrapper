@@ -1,0 +1,27 @@
+*.class
+*.*~
+*.swp
+.gradle
+*.log
+.DS_Store
+
+**/build/*
+
+# Package Files #
+*.jar
+*.war
+*.ear
+**/.DS_Store
+
+hs_err_pid*
+
+**/bin/**/*.*
+
+#Eclipse Files
+**/.classpath
+**/.project
+**/.settings/*
+**/.springBeans
+
+#Ignore .gitignore from subdirectories
+*/.gitignore
