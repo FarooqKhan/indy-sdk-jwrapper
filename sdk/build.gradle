@@ -1,0 +1,38 @@
+description = 'The Sdk Project that is a wrapper of the C-Callable Indy SDK'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+dependencies {
+  compile "org.springframework.data:spring-data-mongodb:${springDataMongoVersion}",
+          "com.fasterxml.jackson.core:jackson-databind:${fastJacksonVersion}",
+          "joda-time:joda-time:2.9.4",
+          "com.google.guava:guava:21.0",
+          "io.dropwizard.metrics:metrics-core:${metricsVersion}"
+}
+
+eclipse {
+  project {
+    name = "${eclipseProjectUnqKey}-${project.name}"
+  }
+}
+
+eclipseJdt {
+  inputFile = file("${rootDir}/buildsupport/eclipsesupport/settings/org.eclipse.jdt.core.prefs")
+  doLast {
+    copy {
+      from "${rootDir}/buildsupport/eclipsesupport/settings/org.eclipse.jdt.ui.prefs"
+      into "${projectDir}/.settings"
+      fileMode 0644
+    }
+  }
+}
+cleanEclipseJdt {
+  doFirst {
+    delete "${projectDir}/.settings"
+  }
+}
+tasks.eclipse.dependsOn(cleanEclipse)
+
+defaultTasks 'clean', 'jar'
+

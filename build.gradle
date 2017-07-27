@@ -1,0 +1,61 @@
+description = 'Root Project for Indy-Sdk-Java'
+
+
+ext {
+  version = "1.0.1" //getVersionName()
+  println "Build Version: $version"
+}
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+}
+
+allprojects {
+  //Set version for all sub projects to inherit
+  version = "1.0.1" //getVersionName()
+  repositories {
+    mavenCentral()
+  }
+
+  ext {
+    eclipseProjectUnqKey = "isj"
+    log4j2Version = "2.6.2"
+    slf4jVersion  = "1.7.14"
+    fastJacksonVersion = "2.7.2"
+  }
+}
+
+subprojects {
+  configurations.all {
+    resolutionStrategy {
+      // fail eagerly on version conflict (includes transitive dependencies)
+      // e.g. multiple different versions of the same dependency (group and name are equal)
+      failOnVersionConflict()
+
+      // force certain versions of dependencies (including transitive)
+      force "org.slf4j:slf4j-api:${slf4jVersion}",
+            "org.slf4j:jcl-over-slf4j:${slf4jVersion}",
+            "com.fasterxml.jackson.core:jackson-core:${fastJacksonVersion}",
+            "com.fasterxml.jackson.core:jackson-annotations:${fastJacksonVersion}",
+            "com.fasterxml.jackson.core:jackson-databind:${fastJacksonVersion}"
+
+      exclude group: "commons-logging", module: "commons-logging"
+
+    }
+  }
+
+}
+
+/*
+ * Gets the version name from the latest Git tag
+ */
+def getVersionName() {
+  def stdout = new ByteArrayOutputStream()
+  exec {
+    commandLine 'git', 'describe', '--tags'
+    standardOutput = stdout
+  }
+  return stdout.toString().trim()
+}
