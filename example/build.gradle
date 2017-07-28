@@ -2,6 +2,7 @@ description = 'This is a example usage project of Indy-Sdk Java Wrapper Project'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
 dependencies {
   compile project(":jwrapper")
@@ -31,4 +32,7 @@ cleanEclipseJdt {
 tasks.eclipse.dependsOn(cleanEclipse)
 
 defaultTasks 'clean', 'jar'
+
+mainClassName = "org.hyperledger.indy.sdk.example.Main"
+
 
