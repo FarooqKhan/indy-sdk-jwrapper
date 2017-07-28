@@ -1,14 +1,10 @@
-description = 'The Sdk Project that is a wrapper of the C-Callable Indy SDK'
+description = 'This is a example usage project of Indy-Sdk Java Wrapper Project'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
 dependencies {
-  compile "org.springframework.data:spring-data-mongodb:${springDataMongoVersion}",
-          "com.fasterxml.jackson.core:jackson-databind:${fastJacksonVersion}",
-          "joda-time:joda-time:2.9.4",
-          "com.google.guava:guava:21.0",
-          "io.dropwizard.metrics:metrics-core:${metricsVersion}"
+  compile project(":jwrapper")
 }
 
 eclipse {

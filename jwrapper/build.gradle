@@ -1,0 +1,37 @@
+description = 'The Sdk Project that is a wrapper of the C-Callable Indy SDK'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+dependencies {
+  compile "net.java.dev.jna:jna:4.4.0",
+          "org.slf4j:slf4j-api:${slf4jVersion}",
+          "org.slf4j:jcl-over-slf4j:${slf4jVersion}",
+          "com.fasterxml.jackson.core:jackson-databind:${fastJacksonVersion}"
+}
+
+eclipse {
+  project {
+    name = "${eclipseProjectUnqKey}-${project.name}"
+  }
+}
+
+eclipseJdt {
+  inputFile = file("${rootDir}/buildsupport/eclipsesupport/settings/org.eclipse.jdt.core.prefs")
+  doLast {
+    copy {
+      from "${rootDir}/buildsupport/eclipsesupport/settings/org.eclipse.jdt.ui.prefs"
+      into "${projectDir}/.settings"
+      fileMode 0644
+    }
+  }
+}
+cleanEclipseJdt {
+  doFirst {
+    delete "${projectDir}/.settings"
+  }
+}
+tasks.eclipse.dependsOn(cleanEclipse)
+
+defaultTasks 'clean', 'jar'
+

@@ -1,1 +1,1 @@
-include "sdk"
+include "jwrapper", "example"
