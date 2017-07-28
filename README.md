@@ -19,3 +19,7 @@ How to Build:
 5. Download and install Indy-Sdk c-callable library. This means depending on your OS you might have a libindy.so or libindy.dylib or libindy.dll present somewhere on your OS. Alternatively you could also clone the Indy-SDK rust project and build it to obtain the library directly.
 
 6. Check the code in the subproject: indy-sdk-jwrapper/example to figure out how this SDK Java Wrapper can be consumed.
+
+7. To run the example code without having to install Eclipse or carry out the complex other Java specific settings, edit file    <code>example/src/main/java/org/hyperledger/indy/sdk/example/Main.java</code>
+make any necessary changes/edits to it save the file, then execute the following command
+<code>./gradlew clean build run</code>
