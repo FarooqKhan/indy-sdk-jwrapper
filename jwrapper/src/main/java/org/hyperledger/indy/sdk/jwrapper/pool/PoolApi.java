@@ -112,16 +112,22 @@ public class PoolApi {
   /**
    * A asynchronous open pool ledger API
    * @param configName name of the pool ledger configuration
-   * @param genesisFilePath genesis file path
+   * @param refreshOnOpen Forces pool ledger to be refreshed immediately after opening
+   * @param autoRefreshTime After this time in minutes pool ledger will be automatically refreshed, use 0 to disable
+   * @param networkTimeout Network timeout for communication with nodes in milliseconds
    * @return A future that returns a IndyResult
    */
-  public CompletableFuture<IndyResult> openPoolLedgerAsync(String configName, String genesisFilePath) {
+  public CompletableFuture<IndyResult> openPoolLedgerAsync(String configName, 
+      boolean refreshOnOpen, int autoRefreshTime, int networkTimeout) {
     CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
     IndyResult iResult = new IndyResult(-1);
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
-    CreatePoolLedgerConfig config = new CreatePoolLedgerConfig(genesisFilePath);
-    
+    OpenPoolLedgerConfig config = new OpenPoolLedgerConfig();
+    config.setRefreshOnOpen(refreshOnOpen);
+    config.setAutoRefreshTime(autoRefreshTime);
+    config.setNetworkTimeout(networkTimeout);
+ 
     String configStr = null;
     try {
       configStr = objectMapper.writeValueAsString(config);
@@ -148,12 +154,16 @@ public class PoolApi {
   /**
    * A synchronous open pool ledger API
    * @param configName config name to create
-   * @param genesisFilePath genesis file path
+   * @param refreshOnOpen Forces pool ledger to be refreshed immediately after opening
+   * @param autoRefreshTime After this time in minutes pool ledger will be automatically refreshed, use 0 to disable
+   * @param networkTimeout Network timeout for communication with nodes in milliseconds
    * @return A IndyResult instance
    */
-  public IndyResult openPoolLedger(String configName, String genesisFilePath) {
+  public IndyResult openPoolLedger(String configName,
+      boolean refreshOnOpen, int autoRefreshTime, int networkTimeout) {
     
-    final CompletableFuture<IndyResult> future = createPoolLedgerConfigAsync(configName, genesisFilePath);
+    final CompletableFuture<IndyResult> future = openPoolLedgerAsync(configName, 
+                                                  refreshOnOpen, autoRefreshTime, networkTimeout);
     
     IndyResult iResult = null;
     try {

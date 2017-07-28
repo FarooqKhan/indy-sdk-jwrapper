@@ -34,8 +34,12 @@ public class Main {
     PoolApi poolApi = new PoolApi(api);
     
     String configName = "vagrant_pool_sandbox";
+    String sandboxFile = "./vagrant_pool_sandbox";
     
-    IndyResult result = poolApi.createPoolLedgerConfig(configName, null);
-    System.out.println("Returnvalue: " + result.getReturnValue() + " ErrorCode: " + result.getErrorCode());
+    IndyResult result = poolApi.createPoolLedgerConfig(configName, sandboxFile);
+    System.out.println("createPoolLedgerConfig:: Returnvalue: " + result.getReturnValue() + " ErrorCode: " + result.getErrorCode());
+    
+    result = poolApi.openPoolLedger(configName, true, 1440, 20000);
+    System.out.println("openPoolLedger:: Returnvalue: " + result.getReturnValue() + " ErrorCode: " + result.getErrorCode());
   }
 }
