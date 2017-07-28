@@ -25,22 +25,50 @@ package org.hyperledger.indy.sdk.jwrapper;
  * @version 1.0 27-Jul-2017
  */
 public class IndyResult {
+  /**
+   * The return value immediately returned by the invoked native API
+   */
   private int returnValue;
+  
+  /**
+   * The value for cmdHandle that is returned back via the callback
+   */
+  private int cmdHandle;
+  
+  /**
+   * The value for returnHandle that is returned back via the callback in some instances
+   * For example when invoking indy_open_pool_ledger() you get the opened Pool Handle
+   */
+  private int returnHandle;
+  
+  /**
+   * The Error Code returned back via the callback, this indicates the actual success or failure of the invocation.
+   */
   private ErrorCode errorCode;
+  
+  /**
+   * A Java Exception that may have happend in the jwrapper scope
+   * TODO: Do we need to return this like this or let a exception be thrown
+   */
   private Exception exception;
-
-  public IndyResult() {
-    super();
-  }
-  public IndyResult(int returnValue) {
-    super();
-    this.returnValue = returnValue;
-  }
+  
   public int getReturnValue() {
     return returnValue;
   }
   public void setReturnValue(int returnValue) {
     this.returnValue = returnValue;
+  }
+  public int getCmdHandle() {
+    return cmdHandle;
+  }
+  public void setCmdHandle(int cmdHandle) {
+    this.cmdHandle = cmdHandle;
+  }
+  public int getReturnHandle() {
+    return returnHandle;
+  }
+  public void setReturnHandle(int returnHandle) {
+    this.returnHandle = returnHandle;
   }
   public ErrorCode getErrorCode() {
     return errorCode;

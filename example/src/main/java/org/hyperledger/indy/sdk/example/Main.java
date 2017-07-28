@@ -36,10 +36,25 @@ public class Main {
     String configName = "vagrant_pool_sandbox";
     String sandboxFile = "./vagrant_pool_sandbox";
     
-    IndyResult result = poolApi.createPoolLedgerConfig(configName, sandboxFile);
-    System.out.println("createPoolLedgerConfig:: Returnvalue: " + result.getReturnValue() + " ErrorCode: " + result.getErrorCode());
     
-    result = poolApi.openPoolLedger(configName, true, 1440, 20000);
-    System.out.println("openPoolLedger:: Returnvalue: " + result.getReturnValue() + " ErrorCode: " + result.getErrorCode());
+    IndyResult r1 = poolApi.createPoolLedgerConfig(configName, sandboxFile);
+    System.out.println("createPoolLedgerConfig() -> Returnvalue: " + r1.getReturnValue() + " ErrorCode: " + r1.getErrorCode()
+                      + " ReturnHandle: " + r1.getReturnHandle());
+    
+    IndyResult  r2 = poolApi.openPoolLedger(configName, true, 1440, 20000);
+    System.out.println("openPoolLedger() -> Returnvalue: " + r2.getReturnValue() + " ErrorCode: " + r2.getErrorCode() 
+                      + " ReturnHandle: " + r2.getReturnHandle());
+    
+    IndyResult  r3 = poolApi.refreshPoolLedger(r2.getReturnHandle());
+    System.out.println("refreshPoolLedger() -> Returnvalue: " + r3.getReturnValue() + " ErrorCode: " + r3.getErrorCode() 
+                      + " ReturnHandle: " + r3.getReturnHandle());
+    
+    IndyResult  r4 = poolApi.closePoolLedger(r2.getReturnHandle());
+    System.out.println("closePoolLedger() -> Returnvalue: " + r4.getReturnValue() + " ErrorCode: " + r4.getErrorCode() 
+                      + " ReturnHandle: " + r4.getReturnHandle());
+    
+    IndyResult r5 = poolApi.deletePoolLedger(configName);
+    System.out.println("deletePoolLedger() -> Returnvalue: " + r5.getReturnValue() + " ErrorCode: " + r5.getErrorCode() 
+                      + " ReturnHandle: " + r5.getReturnHandle());
   }
 }

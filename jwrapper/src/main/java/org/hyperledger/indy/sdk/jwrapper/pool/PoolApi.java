@@ -22,6 +22,7 @@ package org.hyperledger.indy.sdk.jwrapper.pool;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hyperledger.indy.sdk.jwrapper.ErrorCode;
@@ -34,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jna.Callback;
 
 /**
+ * A class that holds all Pool related API's
  * @version 1.0 28-Jul-2017
  */
 public class PoolApi {
@@ -55,23 +57,23 @@ public class PoolApi {
    *                        If file doesn't exists default one will be created.
    * @return A future that returns a IndyResult
    */
-  public CompletableFuture<IndyResult> createPoolLedgerConfigAsync(String configName, String genesisFilePath) {
-    CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
-    IndyResult iResult = new IndyResult(-1);
+  public Future<IndyResult> createPoolLedgerConfigAsync(String configName, String genesisFilePath) {
+    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
+    IndyResult iResult = new IndyResult();
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
-    String configStr = null;
+    String configJson = null;
 
     if (null != genesisFilePath) {
       CreatePoolLedgerConfig config = new CreatePoolLedgerConfig(genesisFilePath);
       try {
-        configStr = objectMapper.writeValueAsString(config);
+        configJson = objectMapper.writeValueAsString(config);
       } catch (JsonProcessingException e) {
         future.completeExceptionally(e);
         return future;
       }
     }
-
+    
     Callback callback = new Callback() {
       @SuppressWarnings("unused")
       public void callback(int cmdHandle, int error) {
@@ -81,9 +83,8 @@ public class PoolApi {
       }
     };
  
-    int rc = nativeApiInstance.indy_create_pool_ledger_config(cmdHandle, configName, configStr, callback);
+    int rc = nativeApiInstance.indy_create_pool_ledger_config(cmdHandle, configName, configJson, callback);
     iResult.setReturnValue(rc);
-    future.complete(iResult);
     return future;
   }
   
@@ -96,14 +97,12 @@ public class PoolApi {
    * @return A IndyResult instance
    */
   public IndyResult createPoolLedgerConfig(String configName, String genesisFilePath) {
-    
-    final CompletableFuture<IndyResult> future = createPoolLedgerConfigAsync(configName, genesisFilePath);
-    
+    final Future<IndyResult> future = createPoolLedgerConfigAsync(configName, genesisFilePath);
     IndyResult iResult = null;
     try {
       iResult = future.get();
     } catch (InterruptedException | ExecutionException e) {
-      iResult = new IndyResult(-1);
+      iResult = new IndyResult();
       iResult.setException(e);
     }
     return iResult;
@@ -117,10 +116,10 @@ public class PoolApi {
    * @param networkTimeout Network timeout for communication with nodes in milliseconds
    * @return A future that returns a IndyResult
    */
-  public CompletableFuture<IndyResult> openPoolLedgerAsync(String configName, 
+  public Future<IndyResult> openPoolLedgerAsync(String configName, 
       boolean refreshOnOpen, int autoRefreshTime, int networkTimeout) {
-    CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
-    IndyResult iResult = new IndyResult(-1);
+    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
+    IndyResult iResult = new IndyResult();
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
     OpenPoolLedgerConfig config = new OpenPoolLedgerConfig();
@@ -128,9 +127,9 @@ public class PoolApi {
     config.setAutoRefreshTime(autoRefreshTime);
     config.setNetworkTimeout(networkTimeout);
  
-    String configStr = null;
+    String configJson = null;
     try {
-      configStr = objectMapper.writeValueAsString(config);
+      configJson = objectMapper.writeValueAsString(config);
     } catch (JsonProcessingException e) {
       future.completeExceptionally(e);
       return future;
@@ -138,16 +137,16 @@ public class PoolApi {
    
     Callback callback = new Callback() {
       @SuppressWarnings("unused")
-      public void callback(int cmdHandle, int error) {
+      public void callback(int cmdHandle, int error, int returnHandle) {
         ErrorCode errorCode = ErrorCode.valueOf(error);
         iResult.setErrorCode(errorCode);
+        iResult.setReturnHandle(returnHandle);
         future.complete(iResult);
       }
     };
  
-    int rc = nativeApiInstance.indy_open_pool_ledger(cmdHandle, configName, configStr, callback);
+    int rc = nativeApiInstance.indy_open_pool_ledger(cmdHandle, configName, configJson, callback);
     iResult.setReturnValue(rc);
-    future.complete(iResult);
     return future;
   }
   
@@ -159,17 +158,141 @@ public class PoolApi {
    * @param networkTimeout Network timeout for communication with nodes in milliseconds
    * @return A IndyResult instance
    */
-  public IndyResult openPoolLedger(String configName,
-      boolean refreshOnOpen, int autoRefreshTime, int networkTimeout) {
+  public IndyResult openPoolLedger(String configName, boolean refreshOnOpen, int autoRefreshTime, int networkTimeout) {
     
-    final CompletableFuture<IndyResult> future = openPoolLedgerAsync(configName, 
+    final Future<IndyResult> future = openPoolLedgerAsync(configName, 
                                                   refreshOnOpen, autoRefreshTime, networkTimeout);
-    
     IndyResult iResult = null;
     try {
       iResult = future.get();
     } catch (InterruptedException | ExecutionException e) {
-      iResult = new IndyResult(-1);
+      iResult = new IndyResult();
+      iResult.setException(e);
+    }
+    return iResult;
+  }
+  
+  /**
+   * A asynchronous refresh pool ledger API
+   * @param poolHandle pool handle returned by openPoolLedger()
+   * @return A future that returns a IndyResult
+   */
+  public Future<IndyResult> refreshPoolLedgerAsync(int poolHandle) {
+    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
+    IndyResult iResult = new IndyResult();
+    
+    int cmdHandle = cmdHandleCounter.incrementAndGet();
+   
+    Callback callback = new Callback() {
+      @SuppressWarnings("unused")
+      public void callback(int cmdHandle, int error) {
+        ErrorCode errorCode = ErrorCode.valueOf(error);
+        iResult.setErrorCode(errorCode);
+        future.complete(iResult);
+      }
+    };
+ 
+    int rc = nativeApiInstance.indy_refresh_pool_ledger(cmdHandle, poolHandle, callback);
+    iResult.setReturnValue(rc);
+    return future;
+  }
+  
+  /**
+   * A synchronous refresh pool ledger API
+   * @param poolHandle pool handle returned by openPoolLedger()
+   * @return A IndyResult instance
+   */
+  public IndyResult refreshPoolLedger(int poolHandle) {
+    final Future<IndyResult> future = refreshPoolLedgerAsync(poolHandle);
+    IndyResult iResult = null;
+    try {
+      iResult = future.get();
+    } catch (InterruptedException | ExecutionException e) {
+      iResult = new IndyResult();
+      iResult.setException(e);
+    }
+    return iResult;
+  }
+  
+  /**
+   * A asynchronous close pool ledger API
+   * @param poolHandle pool handle returned by openPoolLedger()
+   * @return A future that returns a IndyResult
+   */
+  public Future<IndyResult> closePoolLedgerAsync(int poolHandle) {
+    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
+    IndyResult iResult = new IndyResult();
+    
+    int cmdHandle = cmdHandleCounter.incrementAndGet();
+   
+    Callback callback = new Callback() {
+      @SuppressWarnings("unused")
+      public void callback(int cmdHandle, int error) {
+        ErrorCode errorCode = ErrorCode.valueOf(error);
+        iResult.setErrorCode(errorCode);
+        future.complete(iResult);
+      }
+    };
+ 
+    int rc = nativeApiInstance.indy_close_pool_ledger(cmdHandle, poolHandle, callback);
+    iResult.setReturnValue(rc);
+    return future;
+  }
+  
+  /**
+   * A synchronous close pool ledger API
+   * @param poolHandle pool handle returned by openPoolLedger()
+   * @return A IndyResult instance
+   */
+  public IndyResult closePoolLedger(int poolHandle) {
+    final Future<IndyResult> future = closePoolLedgerAsync(poolHandle);
+    IndyResult iResult = null;
+    try {
+      iResult = future.get();
+    } catch (InterruptedException | ExecutionException e) {
+      iResult = new IndyResult();
+      iResult.setException(e);
+    }
+    return iResult;
+  }
+  
+  /**
+   * A asynchronous delete pool ledger API
+   * @param configName Name of the pool ledger configuration to delete
+   * @return A future that returns a IndyResult
+   */
+  public Future<IndyResult> deletePoolLedgerAsync(String configName) {
+    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
+    IndyResult iResult = new IndyResult();
+    
+    int cmdHandle = cmdHandleCounter.incrementAndGet();
+   
+    Callback callback = new Callback() {
+      @SuppressWarnings("unused")
+      public void callback(int cmdHandle, int error) {
+        ErrorCode errorCode = ErrorCode.valueOf(error);
+        iResult.setErrorCode(errorCode);
+        future.complete(iResult);
+      }
+    };
+ 
+    int rc = nativeApiInstance.indy_delete_pool_ledger_config(cmdHandle, configName, callback);
+    iResult.setReturnValue(rc);
+    return future;
+  }
+  
+  /**
+   * A synchronous delete pool ledger API
+   * @param configName Name of the pool ledger configuration to delete
+   * @return A IndyResult instance
+   */
+  public IndyResult deletePoolLedger(String configName) {
+    final Future<IndyResult> future = deletePoolLedgerAsync(configName);
+    IndyResult iResult = null;
+    try {
+      iResult = future.get();
+    } catch (InterruptedException | ExecutionException e) {
+      iResult = new IndyResult();
       iResult.setException(e);
     }
     return iResult;
