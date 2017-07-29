@@ -108,7 +108,7 @@ public class PoolApi implements IIndyApi {
    * @param refreshOnOpen Forces pool ledger to be refreshed immediately after opening
    * @param autoRefreshTime After this time in minutes pool ledger will be automatically refreshed, use 0 to disable
    * @param networkTimeout Network timeout for communication with nodes in milliseconds
-   * @return A future that returns a IndyResult
+   * @return A future that returns a IndyResult which will also contain pool handle
    */
   public Future<IndyResult> openPoolLedgerAsync(String configName, 
       boolean refreshOnOpen, int autoRefreshTime, int networkTimeout) {
@@ -142,7 +142,7 @@ public class PoolApi implements IIndyApi {
    * @param refreshOnOpen Forces pool ledger to be refreshed immediately after opening
    * @param autoRefreshTime After this time in minutes pool ledger will be automatically refreshed, use 0 to disable
    * @param networkTimeout Network timeout for communication with nodes in milliseconds
-   * @return A IndyResult instance
+   * @return A IndyResult instance which will also contain pool handle
    */
   public IndyResult openPoolLedger(String configName, boolean refreshOnOpen, int autoRefreshTime, int networkTimeout) {
     
