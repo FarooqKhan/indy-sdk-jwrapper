@@ -34,8 +34,8 @@ import com.sun.jna.Native;
 /**
  * @version 1.0 27-Jul-2017
  */
-public class IndyApi {
-  private static Logger logger = LoggerFactory.getLogger(IndyApi.class);
+public class IndyNativeApi {
+  private static Logger logger = LoggerFactory.getLogger(IndyNativeApi.class);
   
   private static NativeApi nativeApiInstance = null;
   private ObjectMapper objectMapper = new ObjectMapper();
@@ -44,7 +44,7 @@ public class IndyApi {
   public static final String DEFAULT_LIB_NAME = "indy";
   private String libName = null;
 
-  public IndyApi() {
+  public IndyNativeApi() {
     if (null == nativeApiInstance) {
       try {
         libName = DEFAULT_LIB_NAME;
@@ -57,7 +57,7 @@ public class IndyApi {
     }
   }
   
-  public IndyApi(File file) {
+  public IndyNativeApi(File file) {
     if (null != nativeApiInstance) {
       if (!libName.equals(file.getName())) {
         logger.error("Cannot re-initialize the c-callable native library from a different file.");
@@ -120,7 +120,6 @@ public class IndyApi {
     public int indy_decrypt(int command_handle, int wallet_handle, String myDid, String did, String encrypted_msg, String nonce, Callback cb);
     
     // anoncreds.rs
-    
     public int indy_issuer_create_and_store_claim_def(int command_handle, int wallet_handle, String issuer_did, String schema_json, String signature_type, boolean create_non_revoc, Callback cb);
     public int indy_issuer_create_and_store_revoc_reg(int command_handle, int wallet_handle, String issuer_did, int schema_seq_no, int max_claim_num, Callback cb);
     public int indy_issuer_create_claim(int command_handle, int wallet_handle, String claim_req_json, String claim_json, int revoc_reg_seq_no, int user_revoc_index, Callback cb);

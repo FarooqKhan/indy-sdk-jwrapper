@@ -47,8 +47,7 @@ public class IndyResult {
   private ErrorCode errorCode;
   
   /**
-   * A Java Exception that may have happend in the jwrapper scope
-   * TODO: Do we need to return this like this or let a exception be thrown
+   * A Java Exception that may have happened in the jwrapper scope
    */
   private Exception exception;
   

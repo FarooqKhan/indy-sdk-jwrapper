@@ -25,10 +25,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hyperledger.indy.sdk.jwrapper.ErrorCode;
-import org.hyperledger.indy.sdk.jwrapper.IndyApi;
+import org.hyperledger.indy.sdk.jwrapper.IndyNativeApi;
+import org.hyperledger.indy.sdk.jwrapper.IndyNativeApi.NativeApi;
+import org.hyperledger.indy.sdk.jwrapper.IIndyApi;
+import org.hyperledger.indy.sdk.jwrapper.IndyCallback;
 import org.hyperledger.indy.sdk.jwrapper.IndyResult;
-import org.hyperledger.indy.sdk.jwrapper.IndyApi.NativeApi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,12 +39,12 @@ import com.sun.jna.Callback;
  * A class that holds all Pool related API's
  * @version 1.0 28-Jul-2017
  */
-public class PoolApi {
+public class PoolApi implements IIndyApi {
   private ObjectMapper objectMapper;
   private AtomicInteger cmdHandleCounter;
   private NativeApi nativeApiInstance;
 
-  public PoolApi(IndyApi apiInstance) {
+  public PoolApi(IndyNativeApi apiInstance) {
     this.nativeApiInstance = apiInstance.getNativeApiInstance();
     this.objectMapper = apiInstance.getObjectMapper();
     this.cmdHandleCounter = apiInstance.getCmdHandleCounter();
@@ -74,15 +75,8 @@ public class PoolApi {
       }
     }
     
-    Callback callback = new Callback() {
-      @SuppressWarnings("unused")
-      public void callback(int cmdHandle, int error) {
-        ErrorCode errorCode = ErrorCode.valueOf(error);
-        iResult.setErrorCode(errorCode);
-        future.complete(iResult);
-      }
-    };
- 
+    Callback callback = new IndyCallback.SimpleCallback(future, iResult);
+    
     int rc = nativeApiInstance.indy_create_pool_ledger_config(cmdHandle, configName, configJson, callback);
     iResult.setReturnValue(rc);
     return future;
@@ -135,15 +129,7 @@ public class PoolApi {
       return future;
     }
    
-    Callback callback = new Callback() {
-      @SuppressWarnings("unused")
-      public void callback(int cmdHandle, int error, int returnHandle) {
-        ErrorCode errorCode = ErrorCode.valueOf(error);
-        iResult.setErrorCode(errorCode);
-        iResult.setReturnHandle(returnHandle);
-        future.complete(iResult);
-      }
-    };
+    Callback callback = new IndyCallback.HandleReturningCallback(future, iResult);
  
     int rc = nativeApiInstance.indy_open_pool_ledger(cmdHandle, configName, configJson, callback);
     iResult.setReturnValue(rc);
@@ -183,14 +169,7 @@ public class PoolApi {
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
    
-    Callback callback = new Callback() {
-      @SuppressWarnings("unused")
-      public void callback(int cmdHandle, int error) {
-        ErrorCode errorCode = ErrorCode.valueOf(error);
-        iResult.setErrorCode(errorCode);
-        future.complete(iResult);
-      }
-    };
+    Callback callback = new IndyCallback.SimpleCallback(future, iResult);
  
     int rc = nativeApiInstance.indy_refresh_pool_ledger(cmdHandle, poolHandle, callback);
     iResult.setReturnValue(rc);
@@ -225,14 +204,7 @@ public class PoolApi {
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
    
-    Callback callback = new Callback() {
-      @SuppressWarnings("unused")
-      public void callback(int cmdHandle, int error) {
-        ErrorCode errorCode = ErrorCode.valueOf(error);
-        iResult.setErrorCode(errorCode);
-        future.complete(iResult);
-      }
-    };
+    Callback callback = new IndyCallback.SimpleCallback(future, iResult);
  
     int rc = nativeApiInstance.indy_close_pool_ledger(cmdHandle, poolHandle, callback);
     iResult.setReturnValue(rc);
@@ -267,14 +239,7 @@ public class PoolApi {
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
    
-    Callback callback = new Callback() {
-      @SuppressWarnings("unused")
-      public void callback(int cmdHandle, int error) {
-        ErrorCode errorCode = ErrorCode.valueOf(error);
-        iResult.setErrorCode(errorCode);
-        future.complete(iResult);
-      }
-    };
+    Callback callback = new IndyCallback.SimpleCallback(future, iResult);
  
     int rc = nativeApiInstance.indy_delete_pool_ledger_config(cmdHandle, configName, callback);
     iResult.setReturnValue(rc);
