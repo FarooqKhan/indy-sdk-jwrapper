@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @version 1.0 27-Jul-2017
  */
-public class CreatePoolLedgerConfig {
+class CreatePoolLedgerConfig {
 
   @JsonProperty("genesis_txn")
   private String genesisFilePath;

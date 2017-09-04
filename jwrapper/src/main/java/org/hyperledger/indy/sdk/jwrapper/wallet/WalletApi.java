@@ -29,7 +29,7 @@ import org.hyperledger.indy.sdk.jwrapper.IIndyApi;
 import org.hyperledger.indy.sdk.jwrapper.IndyCallback;
 import org.hyperledger.indy.sdk.jwrapper.IndyNativeApi;
 import org.hyperledger.indy.sdk.jwrapper.IndyNativeApi.NativeApi;
-import org.hyperledger.indy.sdk.jwrapper.IndyResult;
+import org.hyperledger.indy.sdk.jwrapper.GenericResult;
 
 import com.sun.jna.Callback;
 
@@ -58,10 +58,10 @@ public class WalletApi implements IIndyApi {
    *                         pass null when using default type
    * @return A future that returns a IndyResult
    */
-  public Future<IndyResult> createWalletAsync(String poolName, String walletName, 
+  public Future<GenericResult> createWalletAsync(String poolName, String walletName, 
       String walletType, String walletConfigJson, String walletCredentialsJson) {
-    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
-    IndyResult iResult = new IndyResult();
+    final CompletableFuture<GenericResult> future = new CompletableFuture<GenericResult>();
+    GenericResult iResult = new GenericResult();
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
     
@@ -76,28 +76,15 @@ public class WalletApi implements IIndyApi {
   /**
    * A synchronous create wallet API
    *
-   * @param poolName Name of the pool that corresponds to this wallet
-   * @param walletName Name of the wallet 
-   * @param walletType Type of the wallet, pass null to use default
-   * @param walletConfigJson Wallet configuration json, List of supported keys depend on wallet type,
-   *                         pass null when using default type
-   * @param walletCredentialsJson Wallet credentials json, List of supported keys in credential depend on wallet type,
-   *                         pass null when using default type
-   * @return A IndyResult instance
+   * @see org.hyperledger.indy.sdk.jwrapper.wallet.WalletApi#createWalletAsync()
    */
-  public IndyResult createWallet(String poolName, String walletName, 
-      String walletType, String walletConfigJson, String walletCredentialsJson) {
-    final Future<IndyResult> future = createWalletAsync(poolName, walletName,
-        walletType, walletConfigJson, walletCredentialsJson
-        );
-    IndyResult iResult = null;
-    try {
-      iResult = future.get();
-    } catch (InterruptedException | ExecutionException e) {
-      iResult = new IndyResult();
-      iResult.setException(e);
-    }
-    return iResult;
+  public GenericResult createWallet(String poolName, String walletName, String walletType, 
+      String walletConfigJson, String walletCredentialsJson) throws InterruptedException, ExecutionException {
+
+    final Future<GenericResult> future = createWalletAsync(poolName, walletName, walletType, 
+        walletConfigJson, walletCredentialsJson);
+
+    return future.get();
   }
   
   /**
@@ -110,9 +97,9 @@ public class WalletApi implements IIndyApi {
    *                         pass null when using default type
    * @return A future that returns a IndyResult which will also contain wallet handle
    */
-  public Future<IndyResult> openWalletAsync(String walletName, String walletConfigJson, String walletCredentialsJson) {
-    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
-    IndyResult iResult = new IndyResult();
+  public Future<GenericResult> openWalletAsync(String walletName, String walletConfigJson, String walletCredentialsJson) {
+    final CompletableFuture<GenericResult> future = new CompletableFuture<GenericResult>();
+    GenericResult iResult = new GenericResult();
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
     
@@ -126,34 +113,23 @@ public class WalletApi implements IIndyApi {
   /**
    * A synchronous open wallet API
    *
-   * @param walletName Name of the wallet 
-   * @param walletConfigJson Wallet configuration json, List of supported keys depend on wallet type,
-   *                         pass null when using default type
-   * @param walletCredentialsJson Wallet credentials json, List of supported keys in credential depend on wallet type,
-   *                         pass null when using default type
-   * @return A IndyResult instance which will also contain wallet handle
+   * @see org.hyperledger.indy.sdk.jwrapper.wallet.WalletApi#openWalletAsync()
    */
-  public IndyResult openWallet(String walletName, String walletConfigJson, String walletCredentialsJson) {
-    final Future<IndyResult> future = openWalletAsync(walletName, walletConfigJson, walletCredentialsJson
-        );
-    IndyResult iResult = null;
-    try {
-      iResult = future.get();
-    } catch (InterruptedException | ExecutionException e) {
-      iResult = new IndyResult();
-      iResult.setException(e);
-    }
-    return iResult;
+  public GenericResult openWallet(String walletName, String walletConfigJson, String walletCredentialsJson) 
+      throws InterruptedException, ExecutionException {
+    final Future<GenericResult> future = openWalletAsync(walletName, walletConfigJson, walletCredentialsJson);
+    return future.get();
   }
   
   /**
    * A asynchronous close wallet API
+   *
    * @param walletHandle walletHandle returned by openWallet()
    * @return A future that returns a IndyResult
    */
-  public Future<IndyResult> closeWalletAsync(int walletHandle) {
-    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
-    IndyResult iResult = new IndyResult();
+  public Future<GenericResult> closeWalletAsync(int walletHandle) {
+    final CompletableFuture<GenericResult> future = new CompletableFuture<GenericResult>();
+    GenericResult iResult = new GenericResult();
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
    
@@ -166,19 +142,12 @@ public class WalletApi implements IIndyApi {
   
   /**
    * A synchronous close wallet API
-   * @param walletHandle walletHandle returned by openWallet()
-   * @return A IndyResult instance
+   *
+   * @see org.hyperledger.indy.sdk.jwrapper.wallet.WalletApi#closeWalletAsync()
    */
-  public IndyResult closeWallet(int walletHandle) {
-    final Future<IndyResult> future = closeWalletAsync(walletHandle);
-    IndyResult iResult = null;
-    try {
-      iResult = future.get();
-    } catch (InterruptedException | ExecutionException e) {
-      iResult = new IndyResult();
-      iResult.setException(e);
-    }
-    return iResult;
+  public GenericResult closeWallet(int walletHandle) throws InterruptedException, ExecutionException {
+    final Future<GenericResult> future = closeWalletAsync(walletHandle);
+    return future.get();
   }
   
   /**
@@ -188,9 +157,9 @@ public class WalletApi implements IIndyApi {
    *                         pass null when using default type
    * @return A future that returns a IndyResult
    */
-  public Future<IndyResult> deleteWalletAsync(String walletName, String walletCredentialsJson) {
-    final CompletableFuture<IndyResult> future = new CompletableFuture<IndyResult>();
-    IndyResult iResult = new IndyResult();
+  public Future<GenericResult> deleteWalletAsync(String walletName, String walletCredentialsJson) {
+    final CompletableFuture<GenericResult> future = new CompletableFuture<GenericResult>();
+    GenericResult iResult = new GenericResult();
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
    
@@ -203,20 +172,12 @@ public class WalletApi implements IIndyApi {
   
   /**
    * A synchronous delete wallet API
-   * @param walletName Name of the wallet configuration to delete
-   * @param walletCredentialsJson Wallet credentials json, List of supported keys in credential depend on wallet type,
-   *                         pass null when using default type
-   * @return A IndyResult instance
+   * 
+   * @see org.hyperledger.indy.sdk.jwrapper.wallet.WalletApi#deleteWalletAsync()
    */
-  public IndyResult deleteWallet(String walletName, String walletCredentialsJson) {
-    final Future<IndyResult> future = deleteWalletAsync(walletName, walletCredentialsJson);
-    IndyResult iResult = null;
-    try {
-      iResult = future.get();
-    } catch (InterruptedException | ExecutionException e) {
-      iResult = new IndyResult();
-      iResult.setException(e);
-    }
-    return iResult;
+  public GenericResult deleteWallet(String walletName, String walletCredentialsJson) 
+      throws InterruptedException, ExecutionException {
+    final Future<GenericResult> future = deleteWalletAsync(walletName, walletCredentialsJson);
+    return future.get();
   }
 }

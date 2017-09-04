@@ -35,9 +35,9 @@ public class IndyCallback {
    * @version 1.0 29-Jul-2017
    */
   public static class SimpleCallback implements Callback {
-    private CompletableFuture<IndyResult> future;
-    private IndyResult iResult;
-    public SimpleCallback(CompletableFuture<IndyResult> future, IndyResult iResult) {
+    private CompletableFuture<GenericResult> future;
+    private GenericResult iResult;
+    public SimpleCallback(CompletableFuture<GenericResult> future, GenericResult iResult) {
       this.future = future;
       this.iResult = iResult;
     }
@@ -55,9 +55,9 @@ public class IndyCallback {
    * @version 1.0 29-Jul-2017
    */
   public static class HandleReturningCallback implements Callback {
-    private CompletableFuture<IndyResult> future;
-    private IndyResult iResult;
-    public HandleReturningCallback(CompletableFuture<IndyResult> future, IndyResult iResult) {
+    private CompletableFuture<GenericResult> future;
+    private GenericResult iResult;
+    public HandleReturningCallback(CompletableFuture<GenericResult> future, GenericResult iResult) {
       this.future = future;
       this.iResult = iResult;
     }
@@ -66,6 +66,27 @@ public class IndyCallback {
       ErrorCode errorCode = ErrorCode.valueOf(error);
       iResult.setErrorCode(errorCode);
       iResult.setReturnHandle(returnHandle);
+      future.complete(iResult);
+    }
+  }
+  
+  /**
+   * A callback that expects the cmdHandle and error if any, as well as a return Json string
+   * For example when invoking indy_submit_request() you get a return Json string
+   * @version 1.0 29-Jul-2017
+   */
+  public static class JsonReturningCallback implements Callback {
+    private CompletableFuture<GenericResult> future;
+    private GenericResult iResult;
+    public JsonReturningCallback(CompletableFuture<GenericResult> future, GenericResult iResult) {
+      this.future = future;
+      this.iResult = iResult;
+    }
+    
+    public void callback(int cmdHandle, int error, String returnJson) {
+      ErrorCode errorCode = ErrorCode.valueOf(error);
+      iResult.setErrorCode(errorCode);
+      iResult.setReturnJson(returnJson);
       future.complete(iResult);
     }
   }

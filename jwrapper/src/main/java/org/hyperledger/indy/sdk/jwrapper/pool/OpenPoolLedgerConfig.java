@@ -23,7 +23,7 @@ package org.hyperledger.indy.sdk.jwrapper.pool;
 /**
  * @version 1.0 28-Jul-2017
  */
-public class OpenPoolLedgerConfig {
+class OpenPoolLedgerConfig {
   private boolean refreshOnOpen;
   private int autoRefreshTime;
   private int networkTimeout;
