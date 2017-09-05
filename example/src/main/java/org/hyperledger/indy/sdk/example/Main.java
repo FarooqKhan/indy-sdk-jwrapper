@@ -27,7 +27,9 @@ import org.hyperledger.indy.sdk.jwrapper.IndyNativeApi;
 import org.hyperledger.indy.sdk.jwrapper.GenericResult;
 import org.hyperledger.indy.sdk.jwrapper.pool.PoolApi;
 import org.hyperledger.indy.sdk.jwrapper.pool.Pool;
+import org.hyperledger.indy.sdk.jwrapper.wallet.Wallet;
 import org.hyperledger.indy.sdk.jwrapper.wallet.WalletApi;
+import org.hyperledger.indy.sdk.jwrapper.wallet.WalletStatus;
 
 @SuppressWarnings("unused")
 public class Main {
@@ -38,35 +40,37 @@ public class Main {
     PoolApi poolApi = new PoolApi(api);
     WalletApi walletApi = new WalletApi(api);
     
-    String walletName = "MyWallet";
-    String walletType = null; //Passing null so default is used
-    String walletConfigJson = null; //Passing null so default is used
-    String walletCredentialsJson = null; //Passing null so default is used
-    
     try {
-      String poolName = "vagrant";
-      String sandboxFile = "./pool_transactions_sandbox";
-      Pool poolHandle = poolApi.createPoolLedgerConfig(poolName, sandboxFile);
+      Pool poolHandle = new Pool("vagrant_pool");
+      poolHandle.setSandboxFile("./pool_transactions_sandbox");
+      
+      poolHandle = poolApi.createPoolLedgerConfig(poolHandle);
       if (null != poolHandle) {
-        System.out.println("createPoolLedgerConfig() -> Successfully created pool" + poolName);
+        System.out.println("createPoolLedgerConfig() -> Successfully created pool: " + poolHandle.getPoolName());
       }
     
       if (null != poolHandle) {
         poolHandle.setRefreshOnOpen(true);
         poolHandle = poolApi.openPoolLedger(poolHandle);
         if (null != poolHandle) {
-          System.out.println("openPoolLedger() -> Returned Pool Handle: " + poolHandle.getPoolHandle());
+          System.out.println("openPoolLedger() -> Successfully opened pool handle: " + poolHandle.getPoolName());
         }
       }
-/*    
-      GenericResult r3 = walletApi.createWallet(poolName, walletName, walletType, walletConfigJson, walletCredentialsJson);
-      System.out.println("createWallet() -> Returnvalue: " + r3.getReturnValue() + " ErrorCode: " + r3.getErrorCode() 
-                      + " ReturnHandle: " + r3.getReturnHandle());
-    
-      GenericResult r4 = walletApi.openWallet(walletName, walletConfigJson, walletCredentialsJson);
-      System.out.println("openWallet() -> Returnvalue: " + r4.getReturnValue() + " ErrorCode: " + r4.getErrorCode() 
-                      + " ReturnHandle: " + r4.getReturnHandle());*/
       
+      String walletCredentialsJson = null;
+      Wallet walletHandle = null;
+      if (null != poolHandle) {
+        walletHandle = new Wallet("MyWallet");
+        walletHandle = walletApi.createWallet(poolHandle, walletHandle, walletCredentialsJson);
+        if (null != walletHandle) {
+          System.out.println("createWallet() -> Successfully created wallet: " + walletHandle.getWalletName());
+        }
+      }
+      
+      if (null != walletHandle) {
+        walletHandle = walletApi.openWallet(walletHandle, walletCredentialsJson);
+        System.out.println("openWallet() -> Successfully opened wallet handle: " + walletHandle.getWalletName());
+      }
       
       System.out.println("Sleeping or 60000");
       Thread.sleep(60000);
@@ -80,7 +84,7 @@ public class Main {
     
       System.out.println("Sleeping or 60000");
       Thread.sleep(60000);
-      GenericResult r100 = poolApi.deletePoolLedger(poolName);
+      GenericResult r100 = poolApi.deletePoolLedger(poolHandle.getPoolName());
       System.out.println("deletePoolLedger() -> Returnvalue: " + r100.getReturnValue() + " ErrorCode: " + r100.getErrorCode() 
                       + " ReturnHandle: " + r100.getReturnHandle());
     } catch (InterruptedException | ExecutionException e) {

@@ -58,20 +58,20 @@ public class PoolApi implements IIndyApi {
   /**
    * A asynchronous create pool ledger config API
    *
-   * @param poolName name of the pool ledger configuration
+   * @param pool handle to a unused Pool instance
    * @param genesisFilePath A path to genesis transaction file. If NULL, then a default one will be used. 
    *                        If file doesn't exists default one will be created.
    * @return A future that returns a IndyResult
    */
-  public Future<GenericResult> createPoolLedgerConfigAsync(String poolName, String genesisFilePath) {
+  public Future<GenericResult> createPoolLedgerConfigAsync(Pool pool) {
     final CompletableFuture<GenericResult> future = new CompletableFuture<GenericResult>();
     GenericResult iResult = new GenericResult();
     
     int cmdHandle = cmdHandleCounter.incrementAndGet();
     String configJson = null;
 
-    if (null != genesisFilePath) {
-      CreatePoolLedgerConfig config = new CreatePoolLedgerConfig(genesisFilePath);
+    if (null != pool.getSandboxFile()) {
+      CreatePoolLedgerConfig config = new CreatePoolLedgerConfig(pool.getSandboxFile());
       try {
         configJson = objectMapper.writeValueAsString(config);
       } catch (JsonProcessingException e) {
@@ -82,7 +82,7 @@ public class PoolApi implements IIndyApi {
     
     Callback callback = new IndyCallback.SimpleCallback(future, iResult);
     
-    int rc = nativeApiInstance.indy_create_pool_ledger_config(cmdHandle, poolName, configJson, callback);
+    int rc = nativeApiInstance.indy_create_pool_ledger_config(cmdHandle, pool.getPoolName(), configJson, callback);
     iResult.setReturnValue(rc);
     return future;
   }
@@ -90,28 +90,22 @@ public class PoolApi implements IIndyApi {
   /**
    * A synchronous create pool ledger config API
    *
-   * @param poolName name of the pool ledger configuration
+   * @param pool handle to a unused Pool instance
    * @param sandboxFile A path to genesis transaction file. If NULL, then a default one will be used. 
    *                        If file doesn't exists default one will be created.
    * @return A PoolHandle a Pool Instance
    */
-  public Pool createPoolLedgerConfig(String poolName, String sandboxFile) 
-      throws InterruptedException, ExecutionException {
-
-    final Future<GenericResult> future = createPoolLedgerConfigAsync(poolName, sandboxFile);
+  public Pool createPoolLedgerConfig(Pool pool) throws InterruptedException, ExecutionException {
+    final Future<GenericResult> future = createPoolLedgerConfigAsync(pool);
     GenericResult r = future.get();
     
-    Pool p = null;
     if (r.getErrorCode().equals(ErrorCode.Success)) {
-      p = new Pool(poolName);
-      p.setStatus(PoolStatus.CREATED);
-      if (null != sandboxFile) {
-        p.setSandboxFile(sandboxFile);
-      }
+      pool.setStatus(PoolStatus.CREATED);
+      return pool;
     } else {
       logger.error("Failed to create pool ledger. Returnvalue: {}, ErrorCode: {}", r.getReturnValue(), r.getErrorCode());
+      return null;
     }
-    return p;
   }
   
   /**

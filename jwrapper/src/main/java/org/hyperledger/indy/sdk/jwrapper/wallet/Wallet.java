@@ -18,15 +18,56 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.hyperledger.indy.sdk.jwrapper.pool;
+package org.hyperledger.indy.sdk.jwrapper.wallet;
 
 /**
  * @version 1.0 04-Sep-2017
  */
-public enum PoolStatus {
-  UNUSED,
-  CREATED,
-  OPEN,
-  CLOSED,
-  DELETED
+public class Wallet {
+  private int walletHandle;
+  private String walletName;
+  private WalletStatus status = WalletStatus.UNUSED;
+  
+  private String walletType;
+  private String walletConfigJson;
+
+  public Wallet(String walletName) {
+    super();
+    this.walletName = walletName;
+  }
+
+  public int getWalletHandle() {
+    return walletHandle;
+  }
+  public void setWalletHandle(int walletHandle) {
+    this.walletHandle = walletHandle;
+  }
+
+  public String getWalletName() {
+    return walletName;
+  }
+  public void setWalletName(String walletName) {
+    this.walletName = walletName;
+  }
+
+  public WalletStatus getStatus() {
+    return status;
+  }
+  public void setStatus(WalletStatus status) {
+    this.status = status;
+  }
+
+  public String getWalletType() {
+    return walletType;
+  }
+  public void setWalletType(String walletType) {
+    this.walletType = walletType;
+  }
+
+  public String getWalletConfigJson() {
+    return walletConfigJson;
+  }
+  public void setWalletConfigJson(String walletConfigJson) {
+    this.walletConfigJson = walletConfigJson;
+  }
 }

@@ -18,12 +18,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.hyperledger.indy.sdk.jwrapper.pool;
+package org.hyperledger.indy.sdk.jwrapper.wallet;
 
 /**
  * @version 1.0 04-Sep-2017
  */
-public enum PoolStatus {
+public enum WalletStatus {
   UNUSED,
   CREATED,
   OPEN,

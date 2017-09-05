@@ -21,15 +21,21 @@
 package org.hyperledger.indy.sdk.jwrapper.pool;
 
 /**
- * A bean representing a Pool Handle
+ * A bean representing a Pool Handle, 
+ * this bean is used by most of the PoolAPI methods for parameters and return type
  * @version 1.0 04-Sep-2017
  */
 public class Pool {
   
   private int poolHandle;
   private String poolName;
+  
+  /**
+   * A path to genesis transaction file. If NULL, then a default one will be used. 
+   * If file doesn't exists default one will be created
+   */
   private String sandboxFile;
-  private PoolStatus status;
+  private PoolStatus status = PoolStatus.UNUSED;
   
   /**
    * Forces pool ledger to be refreshed immediately after opening
